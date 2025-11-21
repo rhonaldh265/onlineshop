@@ -22,6 +22,7 @@
     .product-card img {
       max-width: 100%;
       border-radius: 6px;
+      cursor: pointer;
     }
     .admin-button {
       position: absolute;
@@ -33,6 +34,18 @@
       text-decoration: none;
       border-radius: 4px;
     }
+    button {
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -42,6 +55,7 @@
   <h1>Product Catalog</h1>
   <div id="product-grid" class="product-grid"></div>
 
+  <!-- ✅ Place the script just before closing </body> -->
   <script>
   document.addEventListener("DOMContentLoaded", () => {
     fetch("data.php")
@@ -50,7 +64,7 @@
         return res.json();
       })
       .then(products => {
-        console.log("Products loaded:", products); // Debug log
+        console.log("Products loaded:", products);
         let grid = document.getElementById("product-grid");
 
         if (!products || products.length === 0) {
@@ -59,14 +73,47 @@
         }
 
         products.forEach(p => {
-          grid.innerHTML += `
-            <div class="product-card">
-              <img src="uploads/${p.image}" alt="${p.name}">
-              <h3>${p.name}</h3>
-              <p>Material: ${p.material}</p>
-              <p>Size: ${p.size}</p>
-              <span>KES ${p.price}</span>
-            </div>`;
+          let card = document.createElement("div");
+          card.className = "product-card";
+
+          // Image element
+          let img = document.createElement("img");
+          img.src = "uploads/" + p.images[0];
+          img.alt = p.name;
+
+          // Rotate images every 2 seconds
+          let current = 0;
+          setInterval(() => {
+            current = (current + 1) % p.images.length;
+            img.src = "uploads/" + p.images[current];
+          }, 2000);
+
+          // On click, show all images (simple gallery for now)
+          img.addEventListener("click", () => {
+            alert("Images for " + p.name + ":\n" + p.images.join(", "));
+            // Later: replace alert with a modal gallery
+          });
+
+          // Product details
+          let details = document.createElement("div");
+          details.innerHTML = `
+            <h3>${p.name}</h3>
+            <p>Material: ${p.material}</p>
+            <p>Size: ${p.size}</p>
+            <span>KES ${p.price}</span>
+          `;
+
+          // Add to Basket button
+          let button = document.createElement("button");
+          button.textContent = "Add to Basket";
+          button.onclick = () => {
+            addToBasket(p);
+          };
+
+          card.appendChild(img);
+          card.appendChild(details);
+          card.appendChild(button);
+          grid.appendChild(card);
         });
       })
       .catch(err => {
@@ -75,6 +122,14 @@
           "<p style='color:red;'>Failed to load products.</p>";
       });
   });
+
+  // Basket logic (localStorage for now)
+  function addToBasket(product) {
+    let basket = JSON.parse(localStorage.getItem("basket")) || [];
+    basket.push(product);
+    localStorage.setItem("basket", JSON.stringify(basket));
+    alert(product.name + " added to basket!");
+  }
   </script>
 </body>
 </html>
