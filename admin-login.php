@@ -1,10 +1,13 @@
-<?php
-$correctPin = "rootAdmin77";
-
-if ($_POST["pin"] === $correctPin) {
-    header("Location: admin.php");
-    exit();
-} else {
-    echo "Incorrect PIN. <a href='index.php'>Go back</a>";
-}
-?>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login</title>
+</head>
+<body>
+  <h1>Admin Login</h1>
+  <form action="admin-login.php" method="post">
+    <input type="password" name="pin" placeholder="Enter Admin PIN">
+    <input type="submit" value="Login">
+  </form>
+</body>
+</html>
