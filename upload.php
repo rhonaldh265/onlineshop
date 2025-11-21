@@ -31,3 +31,4 @@ file_put_contents($dataFile, json_encode($products, JSON_PRETTY_PRINT));
 
 echo "Product uploaded successfully! <a href='index.php'>View Catalog</a>";
 ?>
+
