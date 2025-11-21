@@ -37,21 +37,10 @@
   <div id="product-grid" class="product-grid"></div>
 
 <script>
-fetch("index.php")
+fetch("data.php")
   .then(res => res.json())
-  .then(products => {
-    console.log("Products loaded:", products); // Debug log
-    let grid = document.getElementById("product-grid");
-    products.forEach(p => {
-      grid.innerHTML += `
-        <div class="product-card">
-          <img src="uploads/${p.image}" alt="${p.name}">
-          <h3>${p.name}</h3>
-          <p>Material: ${p.material}</p>
-          <p>Size: ${p.size}</p>
-          <span>KES ${p.price}</span>
-        </div>`;
-    });
+  .then(products => { /* render products */ });
+
   })
   .catch(err => {
     console.error("Error loading products:", err);
