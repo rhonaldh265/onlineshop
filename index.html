@@ -29,23 +29,23 @@
   <h1>Product Catalog</h1>
   <div id="product-grid" class="product-grid"></div>
 
-  <script>
-    // Fetch products from PHP
-    fetch("index.php")
-      .then(response => response.json())
-      .then(products => {
-        let grid = document.getElementById("product-grid");
-        products.forEach(p => {
-          grid.innerHTML += `
-            <div class="product-card">
-              <img src="uploads/${p.image}" alt="${p.name}">
-              <h3>${p.name}</h3>
-              <p>Material: ${p.material}</p>
-              <p>Size: ${p.size}</p>
-              <span>KES ${p.price}</span>
-            </div>`;
-        });
-      });
-  </script>
+<script>
+fetch("index.php")
+  .then(res => res.json())
+  .then(products => {
+    let grid = document.getElementById("product-grid");
+    products.forEach(p => {
+      grid.innerHTML += `
+        <div class="product-card">
+          <img src="uploads/${p.image}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>Material: ${p.material}</p>
+          <p>Size: ${p.size}</p>
+          <span>KES ${p.price}</span>
+        </div>`;
+    });
+  });
+</script>
+
 </body>
 </html>
