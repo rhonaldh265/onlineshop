@@ -33,6 +33,7 @@
 fetch("index.php")
   .then(res => res.json())
   .then(products => {
+    console.log("Products loaded:", products); // Debug log
     let grid = document.getElementById("product-grid");
     products.forEach(p => {
       grid.innerHTML += `
@@ -43,6 +44,12 @@ fetch("index.php")
           <p>Size: ${p.size}</p>
           <span>KES ${p.price}</span>
         </div>`;
+    });
+  })
+  .catch(err => {
+    console.error("Error loading products:", err);
+  });
+</script>
     });
   });
 </script>
