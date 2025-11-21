@@ -1,14 +1,11 @@
-
-  [
+[
   {
-    "name": "Sample Bag",
+    "name": "Sample Leather Bag",
     "material": "Leather",
     "size": "17",
     "price": "1400",
     "image": "sample-bag.png"
-  }
-
-
+  },
   {
     "name": "Sample Summer Dress",
     "material": "Cotton",
@@ -17,4 +14,3 @@
     "image": "sample-dress.png"
   }
 ]
-
