@@ -1,12 +1,8 @@
 <?php
-// Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Path to products.json inside uploads (writable folder)
 $dataFile = __DIR__ . "/uploads/products.json";
-
-// Load products safely
 $products = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), true) : [];
 ?>
 <!DOCTYPE html>
