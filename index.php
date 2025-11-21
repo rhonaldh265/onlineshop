@@ -12,7 +12,6 @@ $products = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), t
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Admin button -->
   <div style="position: absolute; top: 10px; right: 10px;">
     <a href="admin-login.html" style="padding: 8px; background:#333; color:#fff; text-decoration:none; border-radius:4px;">
       Admin Panel
