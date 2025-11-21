@@ -37,9 +37,10 @@
   <div id="product-grid" class="product-grid"></div>
 
 <script>
-fetch("index.php?json=1")
+fetch("data.php")
   .then(res => res.json())
   .then(products => { /* render products */ });
+
 
   })
   .catch(err => console.error("Error loading products:", err));
