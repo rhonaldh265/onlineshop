@@ -1,8 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-
 $dataFile = __DIR__ . "/uploads/products.json";
 $products = file_exists($dataFile) ? json_decode(file_get_contents($dataFile), true) : [];
 
@@ -12,11 +8,15 @@ $size = $_POST['size'];
 $price = $_POST['price'];
 
 $imageFiles = [];
-foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-    $filename = uniqid() . "-" . basename($_FILES['images']['name'][$key]); 
-    $target = __DIR__ . "/uploads/" . $filename;
-    if (move_uploaded_file($tmp_name, $target)) {
-        $imageFiles[] = $filename;
+if (!empty($_FILES['images']['name'][0])) {
+    foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+        // Give each file a unique name to avoid overwriting
+        $filename = uniqid() . "-" . basename($_FILES['images']['name'][$key]);
+        $target = __DIR__ . "/uploads/" . $filename;
+
+        if (move_uploaded_file($tmp_name, $target)) {
+            $imageFiles[] = $filename;
+        }
     }
 }
 
@@ -31,4 +31,5 @@ $products[] = [
 
 file_put_contents($dataFile, json_encode($products, JSON_PRETTY_PRINT));
 header("Location: index.html");
+exit;
 ?>
