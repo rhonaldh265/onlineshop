@@ -1,1 +1,12 @@
-[]
+
+  [
+  {
+    "name": "Sample Bag",
+    "material": "Leather",
+    "size": "17",
+    "price": "1400",
+    "image": "sample-bag.png"
+  }
+]
+
+
