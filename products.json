@@ -7,6 +7,20 @@
     "price": "1400",
     "image": "sample-bag.png"
   }
-]
 
+  {
+    "name": "Sample Leather Bag",
+    "material": "Leather",
+    "size": "17",
+    "price": "1400",
+    "image": "sample-bag.png"
+  },
+  {
+    "name": "Sample Summer Dress",
+    "material": "Cotton",
+    "size": "14",
+    "price": "1800",
+    "image": "sample-dress.png"
+  }
+]
 
