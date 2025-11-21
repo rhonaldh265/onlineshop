@@ -1,22 +1,23 @@
+
 <?php
-$target_dir = "uploads/";
-$target_file = $target_dir . basename($_FILES["image"]["name"]);
+require 'db.php'; // connects to your database
 
-if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-    $newProduct = [
-        "name" => $_POST["name"],
-        "material" => $_POST["material"],
-        "size" => $_POST["size"],
-        "price" => $_POST["price"],
-        "image" => basename($_FILES["image"]["name"])
-    ];
+// Save image to uploads folder
+$targetDir = "uploads/";
+$imageName = basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $imageName;
+move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
 
-    $products = json_decode(file_get_contents("products.json"), true);
-    $products[] = $newProduct;
-    file_put_contents("products.json", json_encode($products, JSON_PRETTY_PRINT));
+// Insert product into database
+$stmt = $pdo->prepare("INSERT INTO products (name, material, size, price, image) VALUES (?, ?, ?, ?, ?)");
+$stmt->execute([
+  $_POST["name"],
+  $_POST["material"],
+  $_POST["size"],
+  $_POST["price"],
+  $imageName
+]);
 
-    echo "Product uploaded successfully! <a href='index.php'>View Catalog</a>";
-} else {
-    echo "Error uploading file.";
-}
+echo "Product uploaded successfully! <a href='index.php'>View Catalog</a>";
 ?>
+
