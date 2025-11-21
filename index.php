@@ -8,7 +8,13 @@ $products = json_decode(file_get_contents("products.json"), true);
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Product Catalog</h1>
+  <div style="position: absolute; top: 10px; right: 10px;">
+  <form action="admin-login.php" method="post">
+    <input type="password" name="pin" placeholder="Enter Admin PIN">
+    <input type="submit" value="Admin Panel">
+  </form>
+</div>
+
   <div class="product-grid">
     <?php foreach ($products as $p): ?>
       <div class="product-card">
