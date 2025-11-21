@@ -4,22 +4,14 @@
   <title>Admin Panel</title>
 </head>
 <body>
-
-<div style="position: absolute; top: 10px; right: 10px;">
-  <form action="admin-login.php" method="post">
-    <input type="password" name="pin" placeholder="Enter Admin PIN">
-    <input type="submit" value="Admin Panel">
-  </form>
-</div>
-
-  <h1>Add New Product</h1>
+  <h1>Upload Product</h1>
   <form action="upload.php" method="post" enctype="multipart/form-data">
-    <label>Product Name:</label><input type="text" name="name"><br>
-    <label>Material:</label><input type="text" name="material"><br>
-    <label>Size:</label><input type="text" name="size"><br>
-    <label>Price:</label><input type="text" name="price"><br>
-    <label>Image:</label><input type="file" name="image"><br>
-    <input type="submit" value="Upload Product">
+    <input type="text" name="name" placeholder="Product Name" required><br>
+    <input type="text" name="material" placeholder="Material" required><br>
+    <input type="text" name="size" placeholder="Size" required><br>
+    <input type="number" name="price" placeholder="Price" required><br>
+    <input type="file" name="image" required><br>
+    <input type="submit" value="Upload">
   </form>
 </body>
 </html>
