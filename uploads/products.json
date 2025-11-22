@@ -1,10 +1,10 @@
 [
   {
     "name": "Blowse",
-    "material": "Silk",
+    "material": "Silk", 
     "size": "44",
     "price": "5000",
-    "image": "p21.png"
+    "images": ["p21.png", "p22.png", "p23.png"],
+    "github_url": "https://rhonaldh265.github.io/classic/p21.png"
   }
 ]
-
