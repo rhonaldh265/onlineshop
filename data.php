@@ -2,36 +2,30 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-$dataFile = __DIR__ . "/uploads/products.json";
+// Database configuration
+$host = 'localhost';
+$dbname = 'your_database_name';
+$username = 'your_username';
+$password = 'your_password';
 
-if (!file_exists($dataFile)) {
-    http_response_code(404);
-    echo json_encode(["error" => "Products file not found"]);
-    exit;
-}
-
-$jsonData = file_get_contents($dataFile);
-$products = json_decode($jsonData, true);
-
-if (json_last_error() !== JSON_ERROR_NONE) {
-    http_response_code(500);
-    echo json_encode(["error" => "Invalid JSON format"]);
-    exit;
-}
-
-// Convert single image to images array for frontend compatibility
-foreach ($products as &$product) {
-    if (isset($product['image']) && !isset($product['images'])) {
-        $product['images'] = [$product['image']];
-        // Remove the old image field if you want
-        // unset($product['image']);
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    $stmt = $pdo->query("SELECT * FROM products ORDER BY id DESC");
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Convert images JSON string to array
+    foreach ($products as &$product) {
+        $product['images'] = json_decode($product['images'], true);
+        if (!isset($product['github_url'])) {
+            $product['github_url'] = "#";
+        }
     }
     
-    // Ensure github_url exists
-    if (!isset($product['github_url'])) {
-        $product['github_url'] = "#";
-    }
+    echo json_encode($products);
+    
+} catch (PDOException $e) {
+    echo json_encode(["error" => "Database error: " . $e->getMessage()]);
 }
-
-echo json_encode($products);
 ?>
