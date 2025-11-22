@@ -2,20 +2,6 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-// Database configuration
-$host = 'localhost';
-$dbname = 'your_database_name';
-$username = 'your_username';
-$password = 'your_password';
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo json_encode(["error" => "Database connection failed: " . $e->getMessage()]);
-    exit;
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
     $material = $_POST['material'] ?? '';
@@ -29,54 +15,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     
-    // Handle file uploads
-    $uploadedImages = [];
-    $uploadDir = __DIR__ . '/uploads/';
-    
-    // Create uploads directory if it doesn't exist
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-    
-    // Process multiple images
-    if (isset($_FILES['images'])) {
-        foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-            if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
-                $fileName = uniqid() . '_' . basename($_FILES['images']['name'][$key]);
-                $uploadFile = $uploadDir . $fileName;
-                
-                // Validate image file
-                $imageFileType = strtolower(pathinfo($uploadFile, PATHINFO_EXTENSION));
-                $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-                
-                if (in_array($imageFileType, $allowedTypes)) {
-                    if (move_uploaded_file($tmp_name, $uploadFile)) {
-                        $uploadedImages[] = $fileName;
+    try {
+        // Connect to SQLite database
+        $db = new SQLite3('products.db');
+        
+        // Handle file uploads
+        $uploadedImages = [];
+        $uploadDir = __DIR__ . '/uploads/';
+        
+        // Create uploads directory if it doesn't exist
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        // Process multiple images
+        if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
+            foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
+                if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
+                    // Generate unique filename
+                    $fileExtension = pathinfo($_FILES['images']['name'][$key], PATHINFO_EXTENSION);
+                    $fileName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $_FILES['images']['name'][$key]);
+                    $uploadFile = $uploadDir . $fileName;
+                    
+                    // Validate image file
+                    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                    if (in_array(strtolower($fileExtension), $allowedTypes)) {
+                        if (move_uploaded_file($tmp_name, $uploadFile)) {
+                            $uploadedImages[] = $fileName;
+                        }
                     }
                 }
             }
         }
-    }
-    
-    if (empty($uploadedImages)) {
-        echo json_encode(["error" => "No valid images uploaded"]);
-        exit;
-    }
-    
-    try {
+        
+        if (empty($uploadedImages)) {
+            echo json_encode(["error" => "No valid images uploaded"]);
+            exit;
+        }
+        
         // Insert product into database
-        $stmt = $pdo->prepare("INSERT INTO products (name, material, size, price, images, github_url) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $db->prepare('INSERT INTO products (name, material, size, price, images, github_url) VALUES (?, ?, ?, ?, ?, ?)');
         $imagesJson = json_encode($uploadedImages);
-        $stmt->execute([$name, $material, $size, $price, $imagesJson, $github_url]);
         
-        echo json_encode([
-            "success" => true,
-            "message" => "Product uploaded successfully",
-            "images" => $uploadedImages,
-            "product_id" => $pdo->lastInsertId()
-        ]);
+        $stmt->bindValue(1, $name);
+        $stmt->bindValue(2, $material);
+        $stmt->bindValue(3, $size);
+        $stmt->bindValue(4, $price);
+        $stmt->bindValue(5, $imagesJson);
+        $stmt->bindValue(6, $github_url);
         
-    } catch (PDOException $e) {
+        if ($stmt->execute()) {
+            echo json_encode([
+                "success" => true,
+                "message" => "Product uploaded successfully",
+                "images" => $uploadedImages,
+                "product_id" => $db->lastInsertRowID()
+            ]);
+        } else {
+            echo json_encode(["error" => "Failed to save product"]);
+        }
+        
+    } catch (Exception $e) {
         echo json_encode(["error" => "Database error: " . $e->getMessage()]);
     }
     
