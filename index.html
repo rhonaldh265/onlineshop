@@ -181,6 +181,21 @@ header {
   margin-bottom: 60px;
 }
 
+/* Loading State */
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: var(--gray);
+  grid-column: 1 / -1;
+}
+
+.loading i {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
 /* Product Card */
 .product-card {
   border-radius: 12px;
@@ -273,20 +288,6 @@ header {
 
 .add-btn:hover {
   background: var(--primary-light);
-}
-
-/* Loading State */
-.loading {
-  text-align: center;
-  padding: 40px;
-  font-size: 18px;
-  color: var(--gray);
-}
-
-.loading i {
-  font-size: 24px;
-  margin-bottom: 10px;
-  color: var(--primary);
 }
 
 /* Basket Modal */
@@ -650,7 +651,7 @@ footer {
       <i class="fas fa-shopping-basket"></i>
       <div id="basketCount">0</div>
     </div>
-    <button id="adminBtn">
+    <button id="adminBtn" onclick="window.open('admin-panel.html', '_blank')">
       <i class="fas fa-user-cog"></i>
       <span>Admin</span>
     </button>
@@ -668,7 +669,6 @@ footer {
   <h2 class="section-title">Our Collection</h2>
   
   <div id="products">
-    <!-- Products will be loaded dynamically from backend -->
     <div class="loading">
       <i class="fas fa-spinner fa-spin"></i>
       <p>Loading products...</p>
@@ -744,6 +744,7 @@ const productsContainer = document.getElementById('products');
 // Load products from backend
 document.addEventListener('DOMContentLoaded', () => {
   loadProducts();
+  initializeBasketFunctionality();
 });
 
 async function loadProducts() {
@@ -787,7 +788,7 @@ function displayProducts(products) {
     productCard.setAttribute('data-price', product.price);
     productCard.setAttribute('data-github-url', product.github_url || '#');
     
-    // Handle images - convert string to array if needed
+    // Handle images - ensure it's always an array
     let images = product.images;
     if (typeof images === 'string') {
       try {
@@ -796,11 +797,15 @@ function displayProducts(products) {
         images = [images];
       }
     }
+    if (!Array.isArray(images)) {
+      images = [images];
+    }
+    
     productCard.setAttribute('data-images', JSON.stringify(images));
     
     productCard.innerHTML = `
       <div class="product-image">
-        <img id="product${index}-img" src="${images[0]}" alt="${product.name}" 
+        <img src="uploads/${images[0]}" alt="${product.name}" 
              onerror="this.src='https://via.placeholder.com/300x300?text=Image+Not+Found'">
       </div>
       <div class="product-info">
@@ -821,7 +826,6 @@ function displayProducts(products) {
   
   // Initialize product functionality after products are loaded
   initializeProductFunctionality();
-  initializeBasketFunctionality();
 }
 
 function initializeProductFunctionality() {
@@ -836,7 +840,7 @@ function initializeProductFunctionality() {
     if (images.length > 1) {
       const interval = setInterval(() => {
         currentIndex = (currentIndex + 1) % images.length;
-        imgEl.src = images[currentIndex];
+        imgEl.src = `uploads/${images[currentIndex]}`;
       }, 2000);
       
       // Click to open modal slideshow
@@ -856,12 +860,14 @@ function initializeProductFunctionality() {
   document.querySelectorAll('.add-btn').forEach((btn, index) => {
     btn.addEventListener('click', () => {
       const card = productCards[index];
+      const images = JSON.parse(card.dataset.images);
+      
       const product = {
         name: card.dataset.name,
         material: card.dataset.material,
         size: card.dataset.size,
         price: parseInt(card.dataset.price.replace(/,/g, '')),
-        img: JSON.parse(card.dataset.images)[0],
+        img: `uploads/${images[0]}`,
         githubUrl: card.dataset.githubUrl,
         quantity: 1
       };
@@ -923,7 +929,6 @@ function initializeBasketFunctionality() {
     
     message += "Please let me know about availability and payment options. Thank you!";
     
-    // Replace with your WhatsApp number
     const waLink = `https://wa.me/254727016623?text=${message}`;
     window.open(waLink, "_blank");
   });
@@ -1013,7 +1018,7 @@ const closeImg = imgModal.querySelector('.close-modal');
 
 function openImageModal(images) {
   let idx = 0;
-  modalImg.src = images[idx];
+  modalImg.src = `uploads/${images[idx]}`;
   imgModal.classList.add('show');
   document.body.style.overflow = 'hidden';
   overlay.classList.add('show');
@@ -1022,7 +1027,7 @@ function openImageModal(images) {
   if (images.length > 1) {
     interval = setInterval(() => {
       idx = (idx + 1) % images.length;
-      modalImg.src = images[idx];
+      modalImg.src = `uploads/${images[idx]}`;
     }, 2000);
   }
   
@@ -1040,12 +1045,6 @@ function openImageModal(images) {
     overlay.classList.remove('show');
   }
 }
-
-// Admin button
-document.getElementById('adminBtn').addEventListener('click', () => {
-  // Redirect to admin login or open admin panel
-  window.location.href = 'admin-login.html';
-});
 
 // Notification function
 function showNotification(message) {
