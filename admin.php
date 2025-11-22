@@ -12,6 +12,8 @@
     .image-preview img { width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 2px solid #ddd; }
     .success { color: green; margin-top: 10px; padding: 10px; background: #f0fff0; border-radius: 4px; }
     .error { color: red; margin-top: 10px; padding: 10px; background: #fff0f0; border-radius: 4px; }
+    .product-list { margin-top: 40px; }
+    .product-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -55,6 +57,11 @@
     <div id="imagePreviews" class="image-preview"></div>
   </form>
 
+  <div class="product-list">
+    <h2>Current Products</h2>
+    <div id="productsList"></div>
+  </div>
+
   <script>
     // Image preview
     document.querySelector('input[name="images[]"]').addEventListener('change', function(e) {
@@ -88,9 +95,10 @@
         const result = await response.json();
         
         if (result.success) {
-          messageDiv.innerHTML = `<div class="success">✅ Product uploaded successfully! Images: ${result.images.join(', ')}</div>`;
+          messageDiv.innerHTML = `<div class="success">✅ Product uploaded successfully!</div>`;
           this.reset();
           document.getElementById('imagePreviews').innerHTML = '';
+          loadProducts(); // Refresh product list
         } else {
           messageDiv.innerHTML = `<div class="error">❌ Error: ${result.error}</div>`;
         }
@@ -98,6 +106,34 @@
         messageDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
       }
     });
+
+    // Load existing products
+    async function loadProducts() {
+      try {
+        const response = await fetch('data.php');
+        const products = await response.json();
+        
+        const productsList = document.getElementById('productsList');
+        productsList.innerHTML = products.map(product => `
+          <div class="product-item">
+            <h3>${product.name} (ID: ${product.id})</h3>
+            <p><strong>Material:</strong> ${product.material} | <strong>Size:</strong> ${product.size} | <strong>Price:</strong> KES ${product.price}</p>
+            <p><strong>Images:</strong> ${product.images.join(', ')}</p>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              ${product.images.map(img => 
+                `<img src="uploads/${img}" style="width: 60px; height: 60px; object-fit: cover;" 
+                      onerror="this.style.display='none'">`
+              ).join('')}
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading products:', error);
+      }
+    }
+
+    // Load products on page load
+    loadProducts();
   </script>
 </body>
 </html>
